@@ -1,16 +1,8 @@
 package ma.enset;
 
-import javafx.application.Application;
-import javafx.collections.FXCollections;
-import javafx.collections.ObservableList;
-import javafx.fxml.Initializable;
-import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.ListView;
-import javafx.scene.layout.AnchorPane;
+
 import javafx.scene.layout.VBox;
-import javafx.scene.text.Text;
-import javafx.stage.Stage;
+
 
 import java.io.*;
 import java.net.ServerSocket;
@@ -18,9 +10,8 @@ import java.net.Socket;
 import java.util.*;
 
 public class MTServer implements Runnable {
+    static ArrayList<String> clientNames=new ArrayList<>();
 
-    VBox boxClients=new VBox();
-    static ArrayList<Socket> clients=new ArrayList<>();
     public static void main(String[] args) {
         new Thread(new MTServer()).start();
 
@@ -28,6 +19,7 @@ public class MTServer implements Runnable {
 
     @Override
     public void run() {
+        ArrayList<Socket> clients=new ArrayList<>();
         int clientId=0;
         //ArrayList<Socket> clients=new ArrayList<>();
         try {
@@ -36,6 +28,7 @@ public class MTServer implements Runnable {
 
             while (true){
                 client=ss.accept();
+
                 clients.add(client);
                 new Conversation(client,++clientId,clients).start();
                 System.out.println("Client "+clientId+" Joined Conversation IP="+client.getRemoteSocketAddress());
@@ -54,10 +47,12 @@ public class MTServer implements Runnable {
         private Socket client;
         private int clientId;
         private ArrayList<Socket> clients;
+
         public Conversation(Socket client,int clientId,ArrayList<Socket> clients){
             this.client=client;
             this.clientId=clientId;
             this.clients=clients;
+
         }
         @Override
         public void run() {
@@ -71,30 +66,41 @@ public class MTServer implements Runnable {
                 PrintWriter pw=new PrintWriter(os,true);
 
                 //Write Msg To Client
-                pw.println("Hello, welcom in conversation.");
+
 
                 //Read Msg Of Client
                 String msgClient;
 
                 while ((msgClient= br.readLine())!=null){
-                    System.out.println("client "+this.clientId+": "+msgClient);
-                    if(msgClient.contains("=>")){
+                    //System.out.println("client "+this.clientId+": "+msgClient);
+
+                    if(msgClient.contains("name:")){
+                        String name=(msgClient.split(":"))[1];
+                        clientNames.add(name);
+                        pw.println("Hello "+name+" ,welcom in conversation.");
+                        //System.out.println(clientNames);
+                    }
+                    else if(msgClient.contains("=>")){
                         String to= (msgClient.split("=>"))[0];
                         msgClient= (msgClient.split("=>"))[1];
                         if(to.contains(",")){
+                            //List<String> msgTo=Arrays.asList(to.split(","));
                             String[] msgTo=to.split(",");
+
                             for(String x : msgTo){
-                                int index=Integer.parseInt(x);
-                                if(clients.size()>=index) {
-                                    pw = new PrintWriter(((Socket) clients.get(index-1)).getOutputStream(), true);
-                                    pw.println("client" + clientId + ": " + msgClient);
+                                int index=clientNames.indexOf(x);
+                                if(clients.size()>=index && index!=(clientId-1)) {
+                                    pw = new PrintWriter(( clients.get(index)).getOutputStream(), true);
+                                    pw.println(clientNames.get(clientId-1) + " : " + msgClient);
                                 }
                             }
                         }else{
-                            int index=Integer.parseInt(to);
-                            if(clients.size()>=index) {
-                                pw = new PrintWriter(((Socket) clients.get(index-1)).getOutputStream(), true);
-                                pw.println("client" + clientId + ": " + msgClient);
+
+                            int index=clientNames.indexOf(to);
+                            //System.out.println(to+" "+index);
+                            if(clients.size()>=index && index!=(clientId-1)) {
+                                pw = new PrintWriter(( clients.get(index)).getOutputStream(), true);
+                                pw.println(clientNames.get(clientId-1) + " : " + msgClient);
                             }
                         }
 
@@ -102,7 +108,7 @@ public class MTServer implements Runnable {
                         for (Socket c : clients) {
                             if (c != client) {
                                 pw = new PrintWriter(c.getOutputStream(), true);
-                                pw.println("client" + clientId + ": " + msgClient);
+                                pw.println(clientNames.get(clientId-1) + " : " + msgClient);
                             }
                         }
                     }
@@ -111,7 +117,6 @@ public class MTServer implements Runnable {
 
             }catch (Exception e){
                 e.printStackTrace();
-
             }
 
         }

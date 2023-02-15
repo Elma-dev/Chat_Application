@@ -3,31 +3,48 @@ package ma.enset;
 import com.sun.javafx.geom.Area;
 import javafx.application.Application;
 import javafx.application.Platform;
+import javafx.geometry.Pos;
 import javafx.scene.Scene;
-import javafx.scene.control.Button;
-import javafx.scene.control.Label;
-import javafx.scene.control.ScrollPane;
-import javafx.scene.control.TextArea;
-import javafx.scene.control.TextField;
+import javafx.scene.control.*;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.VBox;
 import javafx.scene.paint.Color;
-import javafx.scene.paint.Paint;
-import javafx.scene.shape.Rectangle;
+
 import javafx.scene.text.Text;
 import javafx.stage.Stage;
 
-import java.awt.*;
 import java.io.*;
 import java.net.Socket;
-import java.util.ArrayList;
-import java.util.Scanner;
+
 
 public class ClientTelnet extends Application {
     public static void main(String[] args) throws Exception {
         launch(args);
     }
     public void start(Stage stage) throws IOException {
+
+        AnchorPane root2=new AnchorPane();
+        VBox centring=new VBox();
+        TextField name=new TextField();
+        Button accept=new Button("Accepte");
+        centring.setSpacing(10);
+
+        name.setPromptText("Username");
+        centring.getChildren().add(name);
+        centring.getChildren().add(accept);
+        centring.setAlignment(Pos.CENTER);
+        centring.setLayoutX(220);
+        centring.setLayoutY(150);
+        Text alert=new Text();
+        alert.setFill(Color.RED);
+        centring.getChildren().add(0,alert);
+
+
+        root2.getChildren().add(centring);
+        Scene userScene=new Scene(root2);
+        stage.setScene(userScene);
+
+
 
 
 
@@ -36,11 +53,11 @@ public class ClientTelnet extends Application {
         TextField message=new TextField();
         message.setLayoutX(10);
         message.setLayoutY(320);
-        message.setPrefWidth(500);
+        message.setPrefWidth(472);
         message.setPrefHeight(30);
 
         Button send=new Button("Send");
-        send.setLayoutX(515);
+        send.setLayoutX(483);
         send.setLayoutY(320);
 
 
@@ -80,7 +97,6 @@ public class ClientTelnet extends Application {
 
 
 
-
         Socket socket=new Socket("localhost",123);
         InputStream is=socket.getInputStream();
         OutputStream os=socket.getOutputStream();
@@ -102,12 +118,9 @@ public class ClientTelnet extends Application {
                         y = contentPane.getChildren().get(contentPane.getChildren().size() - 1).getLayoutY()+20;
                     }
 
-
                     Text test=new Text(serverMsg);
-
-
                     test.setFill(Color.RED);
-                    test.setLayoutX(10);
+                    test.setLayoutX(5);
                     test.setLayoutY(y);
                     Platform.runLater(()->{
                         contentPane.getChildren().add(test);
@@ -121,30 +134,42 @@ public class ClientTelnet extends Application {
 
 
         send.setOnAction(actionEvent -> {
-            double y=10;
-            if(contentPane.getChildren().size()-1>=0) {
-                y = contentPane.getChildren().get(contentPane.getChildren().size() - 1).getLayoutY()+20;
+            if(!message.getText().isEmpty()){
+                double y=10;
+                if(contentPane.getChildren().size()-1>=0) {
+                    y = contentPane.getChildren().get(contentPane.getChildren().size() - 1).getLayoutY()+20;
+                }
+
+
+                Text test=new Text("me: "+message.getText());
+                test.setFill(Color.GREEN);
+                test.setLayoutX(5);
+                test.setLayoutY(y);
+
+                contentPane.getChildren().add(test);
+                if(!msgTo.getText().isEmpty()){
+                    System.out.println(msgTo.getText()+"=>"+message.getText());
+                    printWriter.println(msgTo.getText()+"=>"+message.getText());
+                }
+                else{
+                    printWriter.println(message.getText());
+                }
+
+                message.setText("");
             }
 
+        });
 
-            Text test=new Text("me: "+message.getText());
-            test.setFill(Color.GREEN);
-            test.setLayoutX(10);
-            test.setLayoutY(y);
 
-            contentPane.getChildren().add(test);
-            if(!msgTo.getText().isEmpty()){
-                System.out.println(msgTo.getText()+"=>"+message.getText());
-                printWriter.println(msgTo.getText()+"=>"+message.getText());
+        accept.setOnAction(actionEvent -> {
+            if(!name.getText().isEmpty() ){
+                printWriter.println("name:"+name.getText());
+                Scene scene=new Scene(root);
+                stage.setScene(scene);
             }
-            else{
-                printWriter.println(message.getText());
+            else {
+                alert.setText("Please Enter Your Username ⚠");
             }
-
-
-
-
-            message.setText("");
 
         });
 
@@ -152,8 +177,6 @@ public class ClientTelnet extends Application {
 
 
 
-        Scene scene=new Scene(root);
-        stage.setScene(scene);
         stage.setHeight(400);
         stage.setWidth(600);
         stage.setTitle("ClientChat");
