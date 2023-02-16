@@ -1,0 +1,13 @@
+.root{
+    -fx-background-image: url("back4.jpg");
+    -fx-background-repeat: no-repeat;
+    -fx-background-size: cover,auto;
+}
+.button{
+    -fx-background-color: #0548f1;
+    -fx-text-fill: white;
+}
+.button:hover{
+    -fx-text-fill: white;
+    -fx-background-color: #05f105;
+}

@@ -57,6 +57,7 @@ public class MTServer implements Runnable {
         @Override
         public void run() {
             try {
+                String name = null;
                 InputStream is = client.getInputStream();
                 OutputStream os = client.getOutputStream();
 
@@ -75,7 +76,7 @@ public class MTServer implements Runnable {
                     //System.out.println("client "+this.clientId+": "+msgClient);
 
                     if(msgClient.contains("name:")){
-                        String name=(msgClient.split(":"))[1];
+                        name=(msgClient.split(":"))[1];
                         clientNames.add(name);
                         pw.println("Hello "+name+" ,welcom in conversation.");
                         //System.out.println(clientNames);
@@ -108,7 +109,7 @@ public class MTServer implements Runnable {
                         for (Socket c : clients) {
                             if (c != client) {
                                 pw = new PrintWriter(c.getOutputStream(), true);
-                                pw.println(clientNames.get(clientId-1) + " : " + msgClient);
+                                pw.println(name + " : " + msgClient);
                             }
                         }
                     }
