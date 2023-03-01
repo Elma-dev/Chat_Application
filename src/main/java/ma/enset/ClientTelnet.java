@@ -197,17 +197,8 @@ public class ClientTelnet extends Application {
                     y = contentPane.getChildren().get(contentPane.getChildren().size() - 1).getLayoutY()+20;
                 }
 
-                /*
-                Text test=new Text("me: "+message.getText());
-                test.setFill(Color.GREEN);
-                test.setLayoutX(5);
-                test.setLayoutY(y);
-                test.setId("outMsg");
-                test.setStyle("-fx-background-color:red ");
-                */
 
                 Button test=new Button("me: "+message.getText());
-                //test.setDisable(true);
                 test.setLayoutX(5);
                 test.setLayoutY(y+10);
                 test.setId("outMsg");
@@ -216,7 +207,6 @@ public class ClientTelnet extends Application {
 
                 contentPane.getChildren().add(test);
                 if(!msgTo.getText().isEmpty()){
-                    //System.out.println(msgTo.getText()+"=>"+message.getText());
                     printWriter.println(msgTo.getText()+"=>"+message.getText());
                 }
                 else{
