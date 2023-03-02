@@ -1,11 +1,11 @@
 package ma.enset;
 
-import com.sun.javafx.geom.Area;
 import javafx.application.Application;
 import javafx.application.Platform;
 import javafx.geometry.Pos;
 import javafx.scene.Scene;
 import javafx.scene.control.*;
+import javafx.scene.image.Image;
 import javafx.scene.image.ImageView;
 import javafx.scene.layout.AnchorPane;
 import javafx.scene.layout.StackPane;
@@ -26,7 +26,6 @@ public class ClientTelnet extends Application {
         launch(args);
     }
     public void start(Stage stage) throws IOException {
-
         AnchorPane root2=new AnchorPane();
         VBox centring=new VBox();
         TextField name=new TextField();
@@ -36,7 +35,6 @@ public class ClientTelnet extends Application {
         //headText
         Text firstTxt=new Text("MyChat Application");
         Text second = new Text("broad-multi cast chat...");
-
 
         firstTxt.setFont(Font.font("Verdana", FontWeight.EXTRA_BOLD, 30));
         firstTxt.setLayoutX(135);
@@ -50,7 +48,6 @@ public class ClientTelnet extends Application {
         second.setFill(Color.valueOf("#FFFFFFFF"));
         root2.getChildren().add(second);
 
-
         name.setPromptText("Username");
 
         centring.getChildren().add(name);
@@ -63,19 +60,11 @@ public class ClientTelnet extends Application {
         alert.setFill(Color.RED);
         centring.getChildren().add(0,alert);
 
-
         root2.getChildren().add(centring);
 
         Scene userScene=new Scene(root2);
-        //System.out.println(getClass().getResource("/style/styleUI1.css").toExternalForm());
         userScene.getStylesheets().add(getClass().getResource("/style/styleUI1.css").toExternalForm());
         stage.setScene(userScene);
-
-
-
-
-
-
 
         AnchorPane root=new AnchorPane();
 
@@ -94,7 +83,6 @@ public class ClientTelnet extends Application {
         m.setFitHeight(25);
         send.setGraphic(m);
         send.setBackground(null);
-
 
         ScrollPane msgPane=new ScrollPane();
         msgPane.setStyle("-fx-border-color: #3469de");
@@ -118,9 +106,6 @@ public class ClientTelnet extends Application {
         msgTo.setLayoutX(35);
         msgTo.setLayoutY(0);
 
-
-
-
         AnchorPane contentPane=new AnchorPane();
         contentPane.setId("contentPane");
         contentPane.setStyle("-fx-background-color: WHITE");
@@ -130,17 +115,14 @@ public class ClientTelnet extends Application {
         contentPane.setPrefHeight(280);
         msgPane.setContent(contentPane);
 
-
         root.getChildren().add(message);
         root.getChildren().add(send);
         root.getChildren().add(to);
         root.getChildren().add(msgTo);
         root.getChildren().add(msgPane);
 
-
-
-
-        Socket socket=new Socket("localhost",123);
+        //connect to srv
+        Socket socket=new Socket("localhost",2001);
         InputStream is=socket.getInputStream();
         OutputStream os=socket.getOutputStream();
 
@@ -155,15 +137,12 @@ public class ClientTelnet extends Application {
                 while((serverMsg=br.readLine())!=null){
                     System.out.println("Here "+serverMsg);
 
-
                     double y=10;
                     if(contentPane.getChildren().size()-1>=0) {
                         y = contentPane.getChildren().get(contentPane.getChildren().size() - 1).getLayoutY()+20;
                     }
 
-
                     Button test=new Button(serverMsg);
-                    //test.setDisable(true);
                     test.setId("inMsg");
 
                     StackPane spane=new StackPane();
@@ -174,13 +153,8 @@ public class ClientTelnet extends Application {
                     spane.setLayoutY(y+10);
                     spane.setAlignment(Pos.BASELINE_RIGHT);
 
-
-
                     Platform.runLater(()->{
-
-
                         contentPane.getChildren().add(spane);
-
                     });
 
 
@@ -189,7 +163,6 @@ public class ClientTelnet extends Application {
             }
         }).start();
 
-
         send.setOnAction(actionEvent -> {
             if(!message.getText().isEmpty()){
                 double y=10;
@@ -197,13 +170,10 @@ public class ClientTelnet extends Application {
                     y = contentPane.getChildren().get(contentPane.getChildren().size() - 1).getLayoutY()+20;
                 }
 
-
                 Button test=new Button("me: "+message.getText());
                 test.setLayoutX(5);
                 test.setLayoutY(y+10);
                 test.setId("outMsg");
-
-
 
                 contentPane.getChildren().add(test);
                 if(!msgTo.getText().isEmpty()){
@@ -218,7 +188,6 @@ public class ClientTelnet extends Application {
 
         });
 
-
         accept.setOnAction(actionEvent -> {
             if(!name.getText().isEmpty() ){
                 printWriter.println("name:"+name.getText());
@@ -232,11 +201,8 @@ public class ClientTelnet extends Application {
 
         });
 
-
-
-
-
         stage.setHeight(400);
+        stage.getIcons().add(new Image(getClass().getResource("/style/chat.png").toExternalForm()));
         stage.setWidth(600);
         stage.setTitle("MyChat");
         stage.setResizable(false);

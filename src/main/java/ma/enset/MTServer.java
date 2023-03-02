@@ -1,9 +1,5 @@
 package ma.enset;
 
-
-import javafx.scene.layout.VBox;
-
-
 import java.io.*;
 import java.net.ServerSocket;
 import java.net.Socket;
@@ -14,16 +10,14 @@ public class MTServer implements Runnable {
 
     public static void main(String[] args) {
         new Thread(new MTServer()).start();
-
     }
 
     @Override
     public void run() {
         ArrayList<Socket> clients=new ArrayList<>();
         int clientId=0;
-        //ArrayList<Socket> clients=new ArrayList<>();
         try {
-            ServerSocket ss=new ServerSocket(123);
+            ServerSocket ss=new ServerSocket(2001);
             Socket client;
 
             while (true){
@@ -66,26 +60,19 @@ public class MTServer implements Runnable {
 
                 PrintWriter pw=new PrintWriter(os,true);
 
-                //Write Msg To Client
-
-
                 //Read Msg Of Client
                 String msgClient;
 
                 while ((msgClient= br.readLine())!=null){
-                    //System.out.println("client "+this.clientId+": "+msgClient);
-
                     if(msgClient.contains("name:")){
                         name=(msgClient.split(":"))[1];
                         clientNames.add(name);
                         pw.println("Hello "+name+" ,welcom in conversation.");
-                        //System.out.println(clientNames);
                     }
                     else if(msgClient.contains("=>")){
                         String to= (msgClient.split("=>"))[0];
                         msgClient= (msgClient.split("=>"))[1];
                         if(to.contains(",")){
-                            //List<String> msgTo=Arrays.asList(to.split(","));
                             String[] msgTo=to.split(",");
 
                             for(String x : msgTo){
@@ -98,7 +85,6 @@ public class MTServer implements Runnable {
                         }else{
 
                             int index=clientNames.indexOf(to);
-                            //System.out.println(to+" "+index);
                             if(clients.size()>=index && index!=(clientId-1)) {
                                 pw = new PrintWriter(( clients.get(index)).getOutputStream(), true);
                                 pw.println(clientNames.get(clientId-1) + " : " + msgClient);
